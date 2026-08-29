@@ -1,0 +1,58 @@
+"""
+ReviveAI backend entrypoint.
+
+Run locally:
+    uvicorn app.main:app --reload
+"""
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+
+from app.config import get_settings
+from app.db.database import Base, engine
+from app.models import models  # noqa: F401 — ensures models are registered on Base
+from app.api.routes import health, orders, payments, recovery, agent, dashboard, webhooks, demo
+from app.utils.logging import get_logger
+
+settings = get_settings()
+logger = get_logger(__name__)
+
+app = FastAPI(
+    title="ReviveAI API",
+    description="AI-native agentic revenue recovery platform for Razorpay merchants (TEST MODE).",
+    version="0.1.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origin_list,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.on_event("startup")
+def on_startup():
+    # Buildathon convenience: auto-create tables. Swap for Alembic migrations in production.
+    Base.metadata.create_all(bind=engine)
+    logger.info("ReviveAI backend started (env=%s)", settings.ENV)
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    logger.exception("Unhandled error on %s %s", request.method, request.url.path)
+    return JSONResponse(
+        status_code=500,
+        content={"success": False, "error": {"code": "INTERNAL_ERROR", "message": "Something went wrong"}},
+    )
+
+
+app.include_router(health.router)
+app.include_router(orders.router)
+app.include_router(payments.router)
+app.include_router(recovery.router)
+app.include_router(agent.router)
+app.include_router(dashboard.router)
+app.include_router(webhooks.router)
+app.include_router(demo.router)
