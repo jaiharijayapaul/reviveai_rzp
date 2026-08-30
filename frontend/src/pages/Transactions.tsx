@@ -40,6 +40,15 @@ function CaseDrawer({
                 <div className="text-xs text-slate-500">Status</div>
                 <div className="mt-1"><Badge label={rcase.status} /></div>
               </div>
+              <div className="col-span-2 mt-2">
+                <div className="flex items-center justify-between bg-slate-900/50 rounded-lg p-3 border border-slate-700/50">
+                  <span className="text-xs text-slate-400">Customer LTV Score</span>
+                  {/* Mock LTV display: if demo VIP, score is 95, else ~50 */}
+                  <span className={`text-sm font-medium ${rcase.amount_at_risk === 500000 ? 'text-brand-400' : 'text-slate-300'}`}>
+                    {rcase.amount_at_risk === 500000 ? '95 (VIP)' : '55 (Avg)'}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -63,7 +72,14 @@ function CaseDrawer({
                 caseActivities.map((act) => (
                   <div key={act.id} className="relative">
                     <div className="absolute -left-[21px] top-1 h-2 w-2 rounded-full bg-emerald-500"></div>
-                    <div className="text-xs text-emerald-400 font-medium">Action Recommended: {act.action_type}</div>
+                    <div className="text-xs text-emerald-400 font-medium flex items-center gap-2">
+                      Action Recommended: {act.action_type}
+                      {act.action_type === "DYNAMIC_OFFER" && (
+                        <span className="px-1.5 py-0.5 rounded text-[10px] uppercase font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse">
+                          Offer Applied
+                        </span>
+                      )}
+                    </div>
                     <div className="text-sm text-slate-300 mt-1">{act.reasoning}</div>
                     <div className="text-xs text-slate-500 mt-2 flex gap-2 items-center">
                       <span>Policy:</span>

@@ -22,6 +22,7 @@ export interface DashboardOverview {
   agent_actions_count: number;
   agent_success_rate: number;
   average_recovery_time_seconds: number | null;
+  fraud_prevented: number;
 }
 
 export interface RecoveryCase {

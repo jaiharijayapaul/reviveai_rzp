@@ -56,7 +56,25 @@ export default function Dashboard() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard label="Revenue at Risk" value={formatINR(data.revenue_at_risk)} accent="risk" />
         <StatCard label="Revenue Recovered" value={formatINR(data.revenue_recovered)} accent="recovered" />
+        <div className="rounded-xl border border-brand-500/30 bg-brand-900/10 p-5 shadow-[0_0_15px_rgba(16,185,129,0.15)] relative overflow-hidden">
+          <div className="absolute -right-4 -top-4 w-24 h-24 bg-brand-500/20 rounded-full blur-2xl"></div>
+          <div className="text-sm font-medium text-brand-400 mb-1">ROI Impact (Net Lift)</div>
+          <div className="text-2xl font-bold text-slate-50 tracking-tight">
+            +{formatINR(data.revenue_recovered)}
+          </div>
+          <div className="text-xs text-brand-500/70 mt-2 font-medium">Powered by Dynamic Offers</div>
+        </div>
         <StatCard label="Recovery Rate" value={`${data.recovery_rate.toFixed(1)}%`} />
+        
+        <div className="rounded-xl border border-red-500/30 bg-red-900/10 p-5 shadow-[0_0_15px_rgba(239,68,68,0.15)] relative overflow-hidden">
+          <div className="absolute -right-4 -top-4 w-24 h-24 bg-red-500/20 rounded-full blur-2xl"></div>
+          <div className="text-sm font-medium text-red-400 mb-1">Fraud Prevented</div>
+          <div className="text-2xl font-bold text-slate-50 tracking-tight">
+            {formatINR(data.fraud_prevented)}
+          </div>
+          <div className="text-xs text-red-500/70 mt-2 font-medium">Risk Shield Active</div>
+        </div>
+
         <StatCard label="Active Recovery Cases" value={String(data.active_recovery_cases)} accent="pending" />
         <StatCard label="Failed Payments" value={String(data.failed_payments)} />
         <StatCard label="Agent Actions" value={String(data.agent_actions_count)} />

@@ -6,6 +6,7 @@ const nav = [
   { to: "/transactions", label: "Transactions" },
   { to: "/agent", label: "AI Agent" },
   { to: "/demo", label: "Demo" },
+  { to: "/policy", label: "Policy Co-Pilot" },
 ];
 
 export default function App() {

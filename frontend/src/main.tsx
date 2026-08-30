@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions";
 import AgentActivity from "./pages/AgentActivity";
 import DemoSimulator from "./pages/DemoSimulator";
+import PolicySettings from "./pages/PolicySettings";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -17,6 +18,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="transactions" element={<Transactions />} />
           <Route path="agent" element={<AgentActivity />} />
           <Route path="demo" element={<DemoSimulator />} />
+          <Route path="policy" element={<PolicySettings />} />
         </Route>
       </Routes>
     </BrowserRouter>
