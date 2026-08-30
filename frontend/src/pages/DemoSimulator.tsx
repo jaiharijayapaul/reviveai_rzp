@@ -1,4 +1,5 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { api, formatINR } from "../api/client";
 import Badge from "../components/Badge";
 
@@ -18,11 +19,14 @@ export default function DemoSimulator() {
     setLoadingId(scenario);
     setError(null);
     setResult(null);
+    const toastId = toast.loading("Simulating scenario: " + scenario);
     try {
       const res = await api.simulate(scenario);
       setResult(res);
+      toast.success("Simulation complete", { id: toastId });
     } catch (e: any) {
       setError(e.message);
+      toast.error(e.message, { id: toastId });
     } finally {
       setLoadingId(null);
     }

@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 const nav = [
   { to: "/", label: "Dashboard", end: true },
@@ -38,6 +39,7 @@ export default function App() {
       <main className="flex-1 p-8 max-w-6xl mx-auto w-full">
         <Outlet />
       </main>
+      <Toaster position="top-right" toastOptions={{ style: { background: '#1e293b', color: '#f8fafc', border: '1px solid #334155' } }} />
     </div>
   );
 }

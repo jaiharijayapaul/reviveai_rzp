@@ -5,7 +5,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/api": "http://localhost:8000",
+      "/api": {
+        target: "https://reviveai-rzp.onrender.com",
+        changeOrigin: true,
+        secure: false,
+      }
     },
   },
 });

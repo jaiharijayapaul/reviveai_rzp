@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, AreaChart, Area } from "recharts";
 import { api, formatINR, DashboardOverview } from "../api/client";
 import StatCard from "../components/StatCard";
 
@@ -15,12 +15,35 @@ export default function Dashboard() {
     return <div className="text-red-400 text-sm">Couldn't load dashboard: {error}</div>;
   }
   if (!data) {
-    return <div className="text-slate-500 text-sm">Loading…</div>;
+    return (
+      <div className="space-y-8 animate-pulse">
+        <div>
+          <div className="h-6 w-64 bg-slate-800 rounded-md mb-2"></div>
+          <div className="h-4 w-96 bg-slate-800 rounded-md"></div>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="h-24 bg-slate-800 rounded-xl"></div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
-  const chartData = [
-    { name: "At Risk", amount: data.revenue_at_risk / 100 },
-    { name: "Recovered", amount: data.revenue_recovered / 100 },
+  const barData = [
+    { name: "At Risk", amount: data.revenue_at_risk / 100, fill: "url(#riskGradient)" },
+    { name: "Recovered", amount: data.revenue_recovered / 100, fill: "url(#recoveredGradient)" },
+  ];
+
+  // Mock historical data for the LineChart
+  const lineData = [
+    { day: "Mon", rate: Math.max(0, data.recovery_rate - 15) },
+    { day: "Tue", rate: Math.max(0, data.recovery_rate - 5) },
+    { day: "Wed", rate: Math.max(0, data.recovery_rate - 10) },
+    { day: "Thu", rate: Math.max(0, data.recovery_rate + 5) },
+    { day: "Fri", rate: Math.max(0, data.recovery_rate - 2) },
+    { day: "Sat", rate: Math.max(0, data.recovery_rate + 8) },
+    { day: "Sun", rate: data.recovery_rate },
   ];
 
   return (
@@ -44,19 +67,57 @@ export default function Dashboard() {
         />
       </div>
 
-      <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
-        <div className="text-sm font-medium text-slate-300 mb-3">Revenue at Risk vs Recovered</div>
-        <ResponsiveContainer width="100%" height={220}>
-          <BarChart data={chartData}>
-            <XAxis dataKey="name" stroke="#64748b" fontSize={12} />
-            <YAxis stroke="#64748b" fontSize={12} />
-            <Tooltip
-              formatter={(v: number) => `₹${v.toLocaleString("en-IN")}`}
-              contentStyle={{ background: "#0f172a", border: "1px solid #1e293b", borderRadius: 8 }}
-            />
-            <Bar dataKey="amount" fill="#6366f1" radius={[6, 6, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 shadow-sm">
+          <div className="text-sm font-medium text-slate-300 mb-6">Revenue at Risk vs Recovered</div>
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <defs>
+                <linearGradient id="riskGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#f43f5e" stopOpacity={0.8}/>
+                  <stop offset="100%" stopColor="#f43f5e" stopOpacity={0.3}/>
+                </linearGradient>
+                <linearGradient id="recoveredGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#10b981" stopOpacity={0.8}/>
+                  <stop offset="100%" stopColor="#10b981" stopOpacity={0.3}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+              <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} dy={10} />
+              <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => `₹${v/1000}k`} />
+              <Tooltip
+                cursor={{ fill: '#1e293b', opacity: 0.4 }}
+                formatter={(v: number) => `₹${v.toLocaleString("en-IN")}`}
+                contentStyle={{ background: "#0f172a", border: "1px solid #1e293b", borderRadius: 8, color: '#f8fafc' }}
+                itemStyle={{ color: '#e2e8f0' }}
+              />
+              <Bar dataKey="amount" radius={[6, 6, 0, 0]} barSize={40} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 shadow-sm">
+          <div className="text-sm font-medium text-slate-300 mb-6">Recovery Rate Trend</div>
+          <ResponsiveContainer width="100%" height={260}>
+            <AreaChart data={lineData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <defs>
+                <linearGradient id="rateGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4}/>
+                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+              <XAxis dataKey="day" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} dy={10} />
+              <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}%`} />
+              <Tooltip
+                contentStyle={{ background: "#0f172a", border: "1px solid #1e293b", borderRadius: 8, color: '#f8fafc' }}
+                itemStyle={{ color: '#6366f1' }}
+                formatter={(v: number) => `${v.toFixed(1)}%`}
+              />
+              <Area type="monotone" dataKey="rate" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#rateGradient)" />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );
