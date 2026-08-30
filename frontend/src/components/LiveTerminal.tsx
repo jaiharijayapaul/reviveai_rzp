@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Terminal } from 'lucide-react';
 
 interface LogEvent {
   id: string;
@@ -15,7 +14,8 @@ export default function LiveTerminal() {
 
   useEffect(() => {
     // We poll the backend for SSE stream
-    const eventSource = new EventSource('http://localhost:8000/api/stream/logs');
+    const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+    const eventSource = new EventSource(`${API_BASE}/stream/logs`);
 
     eventSource.onmessage = (event) => {
       const newLog = JSON.parse(event.data);
@@ -66,7 +66,10 @@ export default function LiveTerminal() {
   return (
     <div className="bg-black border border-gray-800 rounded-lg overflow-hidden flex flex-col h-full font-mono text-[11px] sm:text-xs">
       <div className="bg-gray-900 border-b border-gray-800 px-4 py-2 flex items-center gap-2">
-        <Terminal className="h-4 w-4 text-emerald-500" />
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500">
+          <polyline points="4 17 10 11 4 5"></polyline>
+          <line x1="12" y1="19" x2="20" y2="19"></line>
+        </svg>
         <span className="text-gray-300 font-semibold tracking-wider">LIVE_WEBHOOK_STREAM</span>
         <div className="ml-auto flex gap-1.5">
           <div className="h-2.5 w-2.5 rounded-full bg-red-500"></div>
