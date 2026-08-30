@@ -4,7 +4,7 @@ Dashboard / analytics aggregation queries.
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from app.models.models import RecoveryCase, RecoveryResult, AgentAction, RecoveryStatus
+from app.models import RecoveryCase, RecoveryResult, AgentAction, RecoveryStatus
 
 
 def get_overview(db: Session) -> dict:

@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     ENV: str = "development"
-    DATABASE_URL: str = "postgresql://reviveai:reviveai@localhost:5432/reviveai"
+    DATABASE_URL: str = "postgresql+psycopg://reviveai:reviveai@localhost:5432/reviveai"
 
     RAZORPAY_KEY_ID: str = ""
     RAZORPAY_KEY_SECRET: str = ""

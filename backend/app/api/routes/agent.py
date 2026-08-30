@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-from app.models.models import RecoveryCase, AgentAction
+from app.models import RecoveryCase, AgentAction
 from app.schemas.schemas import RecoveryAnalyzeRequest, AgentActionOut
 from app.services import recovery_service
-from app.models.models import Payment
+from app.models import Payment
 
 router = APIRouter(prefix="/api/agent", tags=["agent"])
 

@@ -10,7 +10,6 @@ from fastapi.responses import JSONResponse
 
 from app.config import get_settings
 from app.db.database import Base, engine
-from app.models import models  # noqa: F401 — ensures models are registered on Base
 from app.api.routes import health, orders, payments, recovery, agent, dashboard, webhooks, demo
 from app.utils.logging import get_logger
 
@@ -34,8 +33,6 @@ app.add_middleware(
 
 @app.on_event("startup")
 def on_startup():
-    # Buildathon convenience: auto-create tables. Swap for Alembic migrations in production.
-    Base.metadata.create_all(bind=engine)
     logger.info("ReviveAI backend started (env=%s)", settings.ENV)
 
 

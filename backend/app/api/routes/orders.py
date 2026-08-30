@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-from app.models.models import Order, Merchant, Customer
+from app.models import Order, Merchant, Customer
 from app.schemas.schemas import OrderCreate, OrderOut
 from app.services.razorpay_service import razorpay_service, RazorpayServiceError
 

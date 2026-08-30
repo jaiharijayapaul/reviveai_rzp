@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-from app.models.models import Payment, RecoveryCase
+from app.models import Payment, RecoveryCase
 from app.schemas.schemas import (
     RecoveryAnalyzeRequest, RecoveryDecideRequest, RecoveryExecuteRequest, RecoveryCaseOut,
 )

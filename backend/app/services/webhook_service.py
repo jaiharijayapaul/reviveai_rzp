@@ -3,7 +3,7 @@ Webhook ingestion: signature verification + idempotent event storage.
 """
 from sqlalchemy.orm import Session
 
-from app.models.models import WebhookEvent
+from app.models import WebhookEvent
 from app.utils.security import verify_razorpay_signature, payload_hash
 from app.config import get_settings
 from app.utils.logging import get_logger

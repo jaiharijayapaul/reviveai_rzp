@@ -12,7 +12,7 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 
-from app.models.models import (
+from app.models import (
     Payment, Customer, RecoveryCase, AgentAction, RecoveryResult,
     RecoveryStatus, RiskLevel, ActionType, MerchantPolicy,
 )
@@ -74,12 +74,12 @@ def analyze_payment(db: Session, payment: Payment, is_demo: bool = False) -> Rec
 
 def _infer_merchant_id(db: Session, payment: Payment) -> str:
     if payment.order_id:
-        from app.models.models import Order
+        from app.models import Order
         order = db.get(Order, payment.order_id)
         if order:
             return order.merchant_id
     # fallback: single-merchant demo mode
-    from app.models.models import Merchant
+    from app.models import Merchant
     m = db.query(Merchant).first()
     return m.id if m else "demo-merchant"
 

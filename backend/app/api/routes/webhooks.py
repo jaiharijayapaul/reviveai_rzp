@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, Request, HTTPException
+from fastapi import APIRouter, Depends, Request, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 import json
 
-from app.db.database import get_db
+from app.db.database import get_db, SessionLocal
 from app.services.webhook_service import process_webhook, WebhookVerificationError
-from app.models.models import Payment, Order, RecoveryStatus
+from app.models import Payment, Order, RecoveryStatus
 from app.services import recovery_service
 from app.utils.logging import get_logger
 
@@ -12,8 +12,28 @@ router = APIRouter(prefix="/api/webhooks", tags=["webhooks"])
 logger = get_logger(__name__)
 
 
+def background_handle_payment_failed(payload_entity: dict):
+    db = SessionLocal()
+    try:
+        _handle_payment_failed(db, payload_entity)
+    finally:
+        db.close()
+
+
+def background_handle_payment_captured(payload_entity: dict):
+    db = SessionLocal()
+    try:
+        _handle_payment_captured(db, payload_entity)
+    finally:
+        db.close()
+
+
 @router.post("/razorpay", summary="Razorpay webhook receiver")
-async def razorpay_webhook(request: Request, db: Session = Depends(get_db)):
+async def razorpay_webhook(
+    request: Request, 
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
     raw_body = await request.body()
     signature = request.headers.get("X-Razorpay-Signature", "")
 
@@ -35,9 +55,9 @@ async def razorpay_webhook(request: Request, db: Session = Depends(get_db)):
 
     try:
         if event_type == "payment.failed":
-            _handle_payment_failed(db, payload_entity)
+            background_tasks.add_task(background_handle_payment_failed, payload_entity)
         elif event_type == "payment.captured":
-            _handle_payment_captured(db, payload_entity)
+            background_tasks.add_task(background_handle_payment_captured, payload_entity)
         # Other event types are stored for audit but not yet acted on.
     finally:
         event.processed = True

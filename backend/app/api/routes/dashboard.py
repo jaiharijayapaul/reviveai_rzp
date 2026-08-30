@@ -34,7 +34,7 @@ def recovery_metrics(db: Session = Depends(get_db)):
 
 @router.get("/activity", summary="Recent agent activity feed")
 def activity(db: Session = Depends(get_db), limit: int = 20):
-    from app.models.models import AgentAction
+    from app.models import AgentAction
     actions = db.query(AgentAction).order_by(AgentAction.created_at.desc()).limit(limit).all()
     return [
         {
