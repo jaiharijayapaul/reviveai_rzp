@@ -2,8 +2,6 @@ import json
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-import anthropic
-
 from app.config import get_settings
 from app.db.database import get_db
 from app.models import Merchant, MerchantPolicy
