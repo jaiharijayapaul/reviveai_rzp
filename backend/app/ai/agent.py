@@ -81,6 +81,7 @@ def decide(ctx: dict) -> AgentDecision:
             previous_attempts=ctx.get("previous_attempts", 1),
             previous_successful_payments=ctx.get("previous_successful_payments", 0),
             previous_failed_payments=ctx.get("previous_failed_payments", 0),
+            customer_ltv_score=ctx.get("customer_ltv_score", 50),
             checkout_abandonment_minutes=ctx.get("checkout_abandonment_minutes", 0),
             recovery_probability=ctx["recovery_probability"],
             risk_level=ctx.get("risk_level", "MEDIUM"),

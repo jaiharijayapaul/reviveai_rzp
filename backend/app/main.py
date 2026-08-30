@@ -10,7 +10,7 @@ from fastapi.responses import JSONResponse
 
 from app.config import get_settings
 from app.db.database import Base, engine
-from app.api.routes import health, orders, payments, recovery, agent, dashboard, webhooks, demo
+from app.api.routes import health, orders, payments, recovery, agent, dashboard, webhooks, demo, policy, stream
 from app.utils.logging import get_logger
 
 settings = get_settings()
@@ -53,3 +53,5 @@ app.include_router(agent.router)
 app.include_router(dashboard.router)
 app.include_router(webhooks.router)
 app.include_router(demo.router)
+app.include_router(policy.router)
+app.include_router(stream.router)

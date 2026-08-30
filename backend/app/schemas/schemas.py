@@ -79,7 +79,8 @@ class AgentDecision(BaseModel):
     """Structured output the agent MUST produce. Never free-form / never executes anything."""
     recommended_action: Literal[
         "RETRY_RECOVERY", "PAYMENT_REMINDER", "PAYMENT_LINK",
-        "ALTERNATIVE_PATH", "ESCALATE", "NO_ACTION"
+        "ALTERNATIVE_PATH", "ESCALATE", "NO_ACTION",
+        "DYNAMIC_OFFER", "RESTRICTED_LINK", "FRAUD_LOCK"
     ]
     confidence: float = Field(..., ge=0, le=1)
     reason: str  # short, user-facing, no chain-of-thought
@@ -106,7 +107,8 @@ class AgentActionOut(BaseModel):
 class DemoScenarioRequest(BaseModel):
     scenario: Literal[
         "TEMPORARY_FAILURE", "CHECKOUT_ABANDONMENT",
-        "REPEATED_FAILURE", "HIGH_VALUE_RISKY"
+        "REPEATED_FAILURE", "HIGH_VALUE_RISKY",
+        "VIP_INSUFFICIENT_FUNDS", "HDFC_CARD_DOWNTIME", "FRAUD_ATTEMPT"
     ]
 
 
@@ -121,6 +123,7 @@ class DashboardOverview(BaseModel):
     agent_actions_count: int
     agent_success_rate: float
     average_recovery_time_seconds: Optional[float]
+    fraud_prevented: int
 
 
 # ---------- Errors ----------

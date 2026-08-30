@@ -28,6 +28,9 @@ class ActionType(str, enum.Enum):
     ALTERNATIVE_PATH = "ALTERNATIVE_PATH"
     ESCALATE = "ESCALATE"
     NO_ACTION = "NO_ACTION"
+    DYNAMIC_OFFER = "DYNAMIC_OFFER"
+    RESTRICTED_LINK = "RESTRICTED_LINK"
+    FRAUD_LOCK = "FRAUD_LOCK"
 
 class RecoveryCase(Base):
     __tablename__ = "recovery_cases"

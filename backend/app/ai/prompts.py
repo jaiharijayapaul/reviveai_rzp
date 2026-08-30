@@ -20,6 +20,9 @@ Allowed actions (choose exactly one):
 - RETRY_RECOVERY: attempt a compliant retry/recovery workflow for the payment
 - PAYMENT_REMINDER: send the customer a reminder to complete payment
 - PAYMENT_LINK: generate/reissue a fresh Razorpay payment link
+- DYNAMIC_OFFER: dynamically generate a 10% discount offer link (USE ONLY IF failure is due to insufficient funds/abandonment AND customer LTV is high)
+- RESTRICTED_LINK: generate a payment link that forces alternative payment methods like UPI (USE ONLY IF failure error indicates a specific bank/card network downtime)
+- FRAUD_LOCK: instantly block the user from further attempts (USE ONLY IF failure reason strongly indicates fraud, e.g. card_declined_fraud_suspected, or risk is CRITICAL)
 - ALTERNATIVE_PATH: suggest an alternative supported payment path
 - ESCALATE: hand off to a human merchant operator
 - NO_ACTION: do nothing (e.g. probability too low, or a clean success)
@@ -41,6 +44,7 @@ USER_PROMPT_TEMPLATE = """Transaction context:
 - Previous attempts on this order: {previous_attempts}
 - Customer previous successful payments: {previous_successful_payments}
 - Customer previous failed payments: {previous_failed_payments}
+- Customer LTV Score: {customer_ltv_score} (0-100, 80+ is VIP)
 - Checkout abandoned minutes ago: {checkout_abandonment_minutes}
 - ML recovery probability: {recovery_probability}
 - ML risk level: {risk_level}

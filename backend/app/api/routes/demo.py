@@ -26,6 +26,15 @@ SCENARIOS = {
     "HIGH_VALUE_RISKY": dict(
         amount=7500000, failure_reason="card_declined", successful=0, failed=4,
     ),
+    "VIP_INSUFFICIENT_FUNDS": dict(
+        amount=500000, failure_reason="insufficient_funds", successful=10, failed=0,
+    ),
+    "HDFC_CARD_DOWNTIME": dict(
+        amount=120000, failure_reason="card_declined_bank_downtime", successful=2, failed=0,
+    ),
+    "FRAUD_ATTEMPT": dict(
+        amount=1500000, failure_reason="card_declined_fraud_suspected", successful=0, failed=8,
+    ),
 }
 
 

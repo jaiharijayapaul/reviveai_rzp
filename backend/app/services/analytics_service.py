@@ -31,6 +31,10 @@ def get_overview(db: Session) -> dict:
     recovery_rate = (revenue_recovered / revenue_at_risk * 100) if revenue_at_risk else 0.0
     agent_success_rate = (successful_actions / agent_actions_count * 100) if agent_actions_count else 0.0
 
+    fraud_prevented = db.query(func.coalesce(func.sum(RecoveryCase.amount_at_risk), 0)).join(
+        AgentAction, RecoveryCase.id == AgentAction.recovery_case_id
+    ).filter(AgentAction.action_type == "FRAUD_LOCK").scalar()
+
     return {
         "revenue_at_risk": int(revenue_at_risk or 0),
         "revenue_recovered": int(revenue_recovered or 0),
@@ -41,4 +45,5 @@ def get_overview(db: Session) -> dict:
         "agent_actions_count": int(agent_actions_count or 0),
         "agent_success_rate": round(agent_success_rate, 2),
         "average_recovery_time_seconds": float(avg_recovery_time) if avg_recovery_time else None,
+        "fraud_prevented": int(fraud_prevented or 0),
     }

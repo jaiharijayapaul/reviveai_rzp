@@ -13,6 +13,7 @@ from app.schemas.schemas import AgentDecision
 ALL_ACTIONS = {
     "RETRY_RECOVERY", "PAYMENT_REMINDER", "PAYMENT_LINK",
     "ALTERNATIVE_PATH", "ESCALATE", "NO_ACTION",
+    "DYNAMIC_OFFER", "RESTRICTED_LINK", "FRAUD_LOCK",
 }
 
 
