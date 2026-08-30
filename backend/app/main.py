@@ -34,7 +34,13 @@ app.add_middleware(
 @app.on_event("startup")
 def on_startup():
     logger.info("ReviveAI backend started (env=%s)", settings.ENV)
-
+    try:
+        from sqlalchemy import text
+        with engine.connect() as conn:
+            conn.execute(text("ALTER TYPE actiontype ADD VALUE IF NOT EXISTS 'FRAUD_LOCK'"))
+            conn.commit()
+    except Exception as e:
+        logger.error("Could not alter actiontype enum: %s", e)
 
 @app.exception_handler(Exception)
 async def unhandled_exception_handler(request: Request, exc: Exception):
