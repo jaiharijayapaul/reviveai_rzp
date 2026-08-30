@@ -150,4 +150,5 @@ Update the policy based on the request and return the JSON.
         )
     except Exception as e:
         logger.error(f"Policy copilot failed: {e}")
-        raise HTTPException(status_code=500, detail="AI Co-pilot failed to parse or execute request.")
+        # Send the exact error to the frontend so we can debug it immediately
+        raise HTTPException(status_code=500, detail=f"AI Co-pilot failed: {str(e)}")
