@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     RAZORPAY_WEBHOOK_SECRET: str = ""
 
     GEMINI_API_KEY: str = ""
-    AGENT_MODEL: str = "gemini-1.5-pro"
+    AGENT_MODEL: str = "gemini-2.5-flash"
 
     CORS_ORIGINS: str = "http://localhost:5173"
     LOG_LEVEL: str = "INFO"
