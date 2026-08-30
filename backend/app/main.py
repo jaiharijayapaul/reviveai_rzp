@@ -37,8 +37,25 @@ def on_startup():
     try:
         from sqlalchemy import text
         with engine.connect() as conn:
-            conn.execute(text("ALTER TYPE actiontype ADD VALUE IF NOT EXISTS 'FRAUD_LOCK'"))
-            conn.commit()
+            # We must commit after each ALTER TYPE if using a transaction block, 
+            # or execute them separately if they might already exist.
+            # However, ADD VALUE IF NOT EXISTS cannot be executed inside a transaction block in older Postgres.
+            # In Postgres 12+ it's fine, but let's do them one by one.
+            try:
+                conn.execute(text("ALTER TYPE actiontype ADD VALUE IF NOT EXISTS 'FRAUD_LOCK'"))
+                conn.commit()
+            except Exception: pass
+            
+            try:
+                conn.execute(text("ALTER TYPE actiontype ADD VALUE IF NOT EXISTS 'DYNAMIC_OFFER'"))
+                conn.commit()
+            except Exception: pass
+            
+            try:
+                conn.execute(text("ALTER TYPE actiontype ADD VALUE IF NOT EXISTS 'RESTRICTED_LINK'"))
+                conn.commit()
+            except Exception: pass
+            
     except Exception as e:
         logger.error("Could not alter actiontype enum: %s", e)
 
