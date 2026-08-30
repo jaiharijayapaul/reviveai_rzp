@@ -95,10 +95,11 @@ def policy_copilot(req: PolicyCopilotRequest, db: Session = Depends(get_db)):
         "approval_threshold": policy.approval_threshold
     }
 
-    if not settings.ANTHROPIC_API_KEY:
-        raise HTTPException(status_code=500, detail="Anthropic API Key not set. Cannot use Co-Pilot.")
+    if not settings.GEMINI_API_KEY:
+        raise HTTPException(status_code=500, detail="Gemini API Key not set. Cannot use Co-Pilot.")
 
-    client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+    import google.generativeai as genai
+    genai.configure(api_key=settings.GEMINI_API_KEY)
     
     user_prompt = f"""
 Current Policy:
@@ -110,14 +111,15 @@ Update the policy based on the request and return the JSON.
     """
 
     try:
-        response = client.messages.create(
-            model=settings.AGENT_MODEL,
-            max_tokens=500,
-            system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": user_prompt}],
+        generation_config = {"response_mime_type": "application/json"}
+        model = genai.GenerativeModel(
+            model_name=settings.AGENT_MODEL,
+            system_instruction=SYSTEM_PROMPT,
+            generation_config=generation_config
         )
-        text = "".join(block.text for block in response.content if block.type == "text").strip()
-        text = text.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+        
+        response = model.generate_content(user_prompt)
+        text = response.text.strip()
         new_data = json.loads(text)
         
         agent_message = new_data.pop("agent_message", "Policy updated successfully.")

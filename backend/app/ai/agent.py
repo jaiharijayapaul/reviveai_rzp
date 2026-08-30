@@ -67,13 +67,21 @@ def decide(ctx: dict) -> AgentDecision:
     max_automated_amount
     """
     settings = get_settings()
-    if not settings.ANTHROPIC_API_KEY:
-        logger.info("No ANTHROPIC_API_KEY set — using deterministic fallback agent.")
+    if not settings.GEMINI_API_KEY:
+        logger.info("No GEMINI_API_KEY set — using deterministic fallback agent.")
         return _deterministic_fallback(ctx)
 
     try:
-        import anthropic
-        client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+        import google.generativeai as genai
+        genai.configure(api_key=settings.GEMINI_API_KEY)
+        
+        # We can configure the model to output JSON
+        generation_config = {"response_mime_type": "application/json"}
+        model = genai.GenerativeModel(
+            model_name=settings.AGENT_MODEL,
+            system_instruction=SYSTEM_PROMPT,
+            generation_config=generation_config
+        )
 
         user_prompt = USER_PROMPT_TEMPLATE.format(
             amount_rupees=ctx["amount"] / 100,
@@ -88,14 +96,9 @@ def decide(ctx: dict) -> AgentDecision:
             max_automated_amount_rupees=ctx.get("max_automated_amount", 5_000_000) / 100,
         )
 
-        response = client.messages.create(
-            model=settings.AGENT_MODEL,
-            max_tokens=300,
-            system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": user_prompt}],
-        )
-        text = "".join(block.text for block in response.content if block.type == "text").strip()
-        text = text.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+        response = model.generate_content(user_prompt)
+        text = response.text.strip()
+        
         data = json.loads(text)
         return AgentDecision(**data)
 

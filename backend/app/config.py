@@ -16,8 +16,8 @@ class Settings(BaseSettings):
     RAZORPAY_KEY_SECRET: str = ""
     RAZORPAY_WEBHOOK_SECRET: str = ""
 
-    ANTHROPIC_API_KEY: str = ""
-    AGENT_MODEL: str = "claude-sonnet-4-6"
+    GEMINI_API_KEY: str = ""
+    AGENT_MODEL: str = "gemini-1.5-pro"
 
     CORS_ORIGINS: str = "http://localhost:5173"
     LOG_LEVEL: str = "INFO"
