@@ -56,8 +56,14 @@ def on_startup():
                 conn.commit()
             except Exception: pass
             
+            # Add missing is_blocked column to customers table for the FRAUD_LOCK feature
+            try:
+                conn.execute(text("ALTER TABLE customers ADD COLUMN IF NOT EXISTS is_blocked BOOLEAN DEFAULT FALSE"))
+                conn.commit()
+            except Exception: pass
+            
     except Exception as e:
-        logger.error("Could not alter actiontype enum: %s", e)
+        logger.error("Could not alter database schema: %s", e)
 
 @app.exception_handler(Exception)
 async def unhandled_exception_handler(request: Request, exc: Exception):
