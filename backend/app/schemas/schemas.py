@@ -113,6 +113,10 @@ class DemoScenarioRequest(BaseModel):
 
 
 # ---------- Dashboard ----------
+class TrendDay(BaseModel):
+    day: str
+    rate: float
+
 class DashboardOverview(BaseModel):
     revenue_at_risk: int
     revenue_recovered: int
@@ -124,6 +128,7 @@ class DashboardOverview(BaseModel):
     agent_success_rate: float
     average_recovery_time_seconds: Optional[float]
     fraud_prevented: int
+    recovery_rate_trend: list[TrendDay]
 
 
 # ---------- Errors ----------
