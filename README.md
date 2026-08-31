@@ -26,12 +26,12 @@ ReviveAI runs every failed or abandoned payment through a bounded, auditable age
 OBSERVE → ANALYZE → PREDICT → DECIDE → GUARDRAIL → ACT → VERIFY → MEASURE
 ```
 
-1. **OBSERVE 🔍**: A Razorpay webhook (`payment.failed`) or a demo scenario registers a failed `Payment`. 🔗 [*See webhook implementation*](./backend/app/api/webhooks.py)
+1. **OBSERVE 🔍**: A Razorpay webhook (`payment.failed`) or a demo scenario registers a failed `Payment`. 🔗 [*See webhook implementation*](./backend/app/api/routes/webhooks.py)
 2. **ANALYZE / PREDICT 🧠**: A Machine Learning model scores the `recovery_probability` and `risk_level` based on transaction and customer features. 🔗 [*See ML integration*](./backend/ml/train.py)
-3. **DECIDE 🤖**: A Gemini LLM agent evaluates the context and recommends one action from a strict *closed* set, formatted as structured JSON. **The LLM has no direct execution power.** 🔗 [*See Agent orchestration*](./backend/app/services/agent_service.py)
-4. **GUARDRAIL 🛡️**: A deterministic Policy Engine validates or overrides the AI's recommendation based on hardcoded merchant rules (e.g., amount limits, risk thresholds, attempt caps). 🔗 [*See Policy Engine*](./backend/app/policy/)
+3. **DECIDE 🤖**: A Gemini LLM agent evaluates the context and recommends one action from a strict *closed* set, formatted as structured JSON. **The LLM has no direct execution power.** 🔗 [*See Agent orchestration*](./backend/app/ai/agent.py)
+4. **GUARDRAIL 🛡️**: A deterministic Policy Engine validates or overrides the AI's recommendation based on hardcoded merchant rules (e.g., amount limits, risk thresholds, attempt caps). 🔗 [*See Policy Engine*](./backend/app/ai/policy_engine.py)
 5. **ACT ⚡**: Only the approved, policy-compliant action is executed via a safe Razorpay-SDK wrapper. 🔗 [*See Razorpay SDK wrapper*](./backend/app/services/razorpay_service.py)
-6. **VERIFY / MEASURE 📊**: The outcome is recorded and aggregated into recovery-rate analytics on the merchant dashboard. 🔗 [*See Dashboard API*](./backend/app/api/dashboard.py)
+6. **VERIFY / MEASURE 📊**: The outcome is recorded and aggregated into recovery-rate analytics on the merchant dashboard. 🔗 [*See Dashboard API*](./backend/app/api/routes/dashboard.py)
 
 ### Why this is safe
 The LLM never touches money or external APIs directly. It is heavily sandboxed:
@@ -73,11 +73,11 @@ The following environment variables are required in the backend ([`backend/.env`
 
 1.  **Issue: LLM Hallucinations and Unsafe API Calls**
     *   *Problem:* LLMs are non-deterministic. Giving an LLM direct access to a payment API could result in hallucinated refunds, invalid endpoints, or dangerous financial actions.
-    *   *Solution:* We implemented the **Guardrail Pattern**. The Gemini agent is forced to output a structured JSON response selecting from an enum of allowed actions (`PAYMENT_REMINDER`, `NEW_PAYMENT_LINK`, `FRAUD_LOCK`, etc.). This response is then piped through a deterministic **Policy Engine** which enforces hard rules. 🔗 [*Review the Policy logic*](./backend/app/policy/)
+    *   *Solution:* We implemented the **Guardrail Pattern**. The Gemini agent is forced to output a structured JSON response selecting from an enum of allowed actions (`PAYMENT_REMINDER`, `NEW_PAYMENT_LINK`, `FRAUD_LOCK`, etc.). This response is then piped through a deterministic **Policy Engine** which enforces hard rules. 🔗 [*Review the Policy logic*](./backend/app/ai/policy_engine.py)
 
 2.  **Issue: Testing Webhook Flows Locally**
     *   *Problem:* Triggering real failed payments in Razorpay to test the end-to-end webhook-to-agent pipeline is tedious and slow during active development.
-    *   *Solution:* We built a comprehensive **Demo Simulator** route. It mocks Razorpay webhook payloads and injects them directly into the processing pipeline, allowing us to test edge cases instantly. 🔗 [*Review the Demo endpoints*](./backend/app/api/demo.py)
+    *   *Solution:* We built a comprehensive **Demo Simulator** route. It mocks Razorpay webhook payloads and injects them directly into the processing pipeline, allowing us to test edge cases instantly. 🔗 [*Review the Demo endpoints*](./backend/app/api/routes/demo.py)
 
 3.  **Issue: ML Cold Start Problem**
     *   *Problem:* We didn't have access to real merchant failure data to train our `recovery_probability` model.
@@ -102,10 +102,10 @@ The backend is the core intelligence and execution engine of ReviveAI.
 It exposes REST APIs for the frontend, securely listens for Razorpay webhooks, runs transactions through the Scikit-Learn ML model, prompts the Gemini LLM for a recovery strategy, filters that strategy through the Policy Engine, and safely communicates with the Razorpay API to generate new payment links.
 
 **What it has ([`backend/`](./backend)):**
-*   [`app/api/`](./backend/app/api/): FastAPI routers for different domains (`orders`, `payments`, `webhooks`, `agent`, `dashboard`, `demo`).
-*   [`app/services/`](./backend/app/services/): Core business logic, including `razorpay_service.py` and `agent_service.py`.
+*   [`app/api/routes/`](./backend/app/api/routes/): FastAPI routers for different domains (`orders`, `payments`, `webhooks`, `agent`, `dashboard`, `demo`).
+*   [`app/services/`](./backend/app/services/): Core business logic, including `razorpay_service.py` and `recovery_service.py`.
 *   [`app/db/`](./backend/app/db/): Database configuration, SQLAlchemy models, and session management.
-*   [`app/policy/`](./backend/app/policy/): The deterministic Guardrail engine that keeps the AI safe.
+*   [`app/ai/`](./backend/app/ai/): The deterministic Policy Guardrail engine and Gemini AI agent orchestration.
 *   [`ml/`](./backend/ml/): The Scikit-Learn machine learning pipeline.
 *   [`tests/`](./backend/tests/): Comprehensive test suites.
 
