@@ -35,16 +35,7 @@ export default function Dashboard() {
     { name: "Recovered", amount: data.revenue_recovered / 100, fill: "url(#recoveredGradient)" },
   ];
 
-  // Mock historical data for the LineChart
-  const lineData = [
-    { day: "Mon", rate: Math.max(0, data.recovery_rate - 15) },
-    { day: "Tue", rate: Math.max(0, data.recovery_rate - 5) },
-    { day: "Wed", rate: Math.max(0, data.recovery_rate - 10) },
-    { day: "Thu", rate: Math.max(0, data.recovery_rate + 5) },
-    { day: "Fri", rate: Math.max(0, data.recovery_rate - 2) },
-    { day: "Sat", rate: Math.max(0, data.recovery_rate + 8) },
-    { day: "Sun", rate: data.recovery_rate },
-  ];
+
 
   return (
     <div className="space-y-8">
@@ -117,7 +108,7 @@ export default function Dashboard() {
         <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 shadow-sm">
           <div className="text-sm font-medium text-slate-300 mb-6">Recovery Rate Trend</div>
           <ResponsiveContainer width="100%" height={260}>
-            <AreaChart data={lineData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <AreaChart data={data.recovery_rate_trend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="rateGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4}/>
